@@ -11,20 +11,19 @@ class Program
         try
         {
          
-            string username = ConfigurationManager.AppSettings["username"];
-            string password = ConfigurationManager.AppSettings["password"];
-            string crmurl = ConfigurationManager.AppSettings["crmurl"];
+            string url = ConfigurationManager.AppSettings["url"];
+            string appid = ConfigurationManager.AppSettings["appid"];
+            string secret = ConfigurationManager.AppSettings["secret"];
+    
+            var conn = new CrmServiceClient($@"AuthType=ClientSecret;url={url};ClientId={appid};ClientSecret={secret}");
 
-            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            CrmServiceClient conn = new CrmServiceClient("authtype=Office365;Url=" + crmurl + "; Username=" + username + "; Password=" + password);
-            IOrganizationService service = conn.OrganizationServiceProxy;
-
-            Entity contact = new Entity("contact");
-            contact["fullname"] = "Danilo Capuano";
-            contact["firstname"] = "Danilo";
-            contact["lastname"] = "Capuano";
-
-            service.Create(contact);
+            if (conn.IsReady)
+            {
+                Entity contact = new Entity("contact");
+                contact.Attributes["firstname"] = "Danilo";
+                contact.Attributes["lastname"] = "Capuano";
+                conn.Create(contact);
+            }
 
         }
         catch (Exception e)
